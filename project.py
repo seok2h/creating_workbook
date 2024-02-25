@@ -40,9 +40,9 @@ def make_folder(stages) -> None:        # make directory with the stage name
         stage_name = stage.get_text()
         stage_name = replace_invalid_characters(stage_name)
         if (idx + 1) < 10:
-            os.makedirs(f"./problems/0{idx+1}_{stage_name}")
+            os.makedirs(f"./problems/0{idx+1}_{stage_name}", exist_ok=True)
         else:
-            os.makedirs(f"./problems/{idx+1}_{stage_name}")
+            os.makedirs(f"./problems/{idx+1}_{stage_name}", exist_ok=True)
 
 def make_quiz_file(stages) -> None:
     list_dir = os.listdir('./problems') # get names of element in problems directory
@@ -56,24 +56,24 @@ def make_quiz_file(stages) -> None:
         
         soup = get_beautifulsoup(URL+stage['href'])     
         table = soup.find('table', id='problemset')     # get html table element 
-        quiz_links = table.find_all('a')                
+        quiz_a_tags = table.find_all('a')                
 
         idx_quiz = 1
-        for quiz_link in quiz_links:
-            if quiz_link['href'].startswith("/p"):      # the a tag contains not only name of quiz but also other links
-                quiz_name = quiz_link.get_text()
+        for quiz_a_tag in quiz_a_tags:
+            if quiz_a_tag['href'].startswith("/p"):      # the a tag contains not only name of quiz but also other links
+                quiz_name = quiz_a_tag.get_text()
                 quiz_name = replace_invalid_characters(quiz_name)
                 
                 if idx_quiz < 10:
 
                     with open(f'./problems/{list_dir[dir_idx]}/0{idx_quiz}_{quiz_name}.py', 'w', encoding='utf-8') as f:
                         # pass
-                        insert_content(f, quiz_link)
+                        insert_content(f, quiz_a_tag)
                     
                 else:
                     with open(f'./problems/{list_dir[dir_idx]}/{idx_quiz}_{quiz_name}.py', 'w', encoding='utf-8') as f:
                         # pass
-                        insert_content(f, quiz_link)
+                        insert_content(f, quiz_a_tag)
 
                 idx_quiz += 1
                 
@@ -82,18 +82,44 @@ def make_quiz_file(stages) -> None:
                 continue       
 
 
-def insert_content(f, quiz_link) -> None:
+def insert_content(f, quiz_a_tag) -> None:
+    quiz_link = URL + quiz_a_tag['href']
     soup = get_beautifulsoup(quiz_link)
     
-    problem_name = soup.find('span', id='problem_title')
-    problem_number = quiz_link.split('/')[-1]
-    problem_content = soup.find('div', id='problem-body')
+    p_name = soup.find('span', id='problem_title').get_text()
+    p_number = quiz_link.split('/')[-1]
+    p_content = soup.find('div', id='problem-body').get_text()
 
-    f.write(f'url: {quiz_link}')
-    f.write(problem_name+'\n')
-    f.write(problem_number+'\n')
-    f.write(problem_content)
+    p_description = soup.find('div', id='problem_description').get_text().strip()
+    p_input = soup.find('div', id='problem_input').get_text().strip()
+    p_output = soup.find('div', id='problem_output').get_text().strip()
+    
+    content = f"""
+'''
+url: {quiz_link}
+제목: {p_name}
+번호: {p_number}
 
+문제
+{p_description}
+
+입력
+{p_input}
+
+출력
+{p_output}
+'''
+"""
+
+    f.write(content)
+
+    # f.write('"""\n' )
+    # f.write(f'url: {quiz_link}\n')
+    # f.write(f'제목: {problem_name}'+'\n')
+    # f.write(f'변호: {problem_number}'+'\n')
+    # f.write(problem_content)
+    # f.write('"""\n')
+    
 
 
 if __name__ == '__main__':
@@ -102,5 +128,6 @@ if __name__ == '__main__':
     make_folder(stages)
     make_quiz_file(stages)
     
+    print("Complete!!!")
 
     
