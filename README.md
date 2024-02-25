@@ -1,6 +1,6 @@
 # 백준 문제집 만들기
 
-출처: https://www.acmicpc.net/step
-
 백준 '단계별로 풀어보기' 사이트를 크롤링해 바로 풀 수 있는 파이썬 파일 자동으로 생성
+
+링크: https://www.acmicpc.net/step
 
