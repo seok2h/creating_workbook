@@ -113,14 +113,6 @@ url: {quiz_link}
 
     f.write(content)
 
-    # f.write('"""\n' )
-    # f.write(f'url: {quiz_link}\n')
-    # f.write(f'제목: {problem_name}'+'\n')
-    # f.write(f'변호: {problem_number}'+'\n')
-    # f.write(problem_content)
-    # f.write('"""\n')
-    
-
 
 if __name__ == '__main__':
     soup = get_beautifulsoup(URL+'/step')
